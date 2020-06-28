@@ -1,0 +1,21 @@
+seed: 616
+train:
+  dataloader:
+    path: './data'
+    patchsize: [64,64]
+    margin: [80,80]
+    batch: 512
+    resize: [128,128]
+
+  model:
+    z_dim: 1024
+    hidden_dim: [16,32,64,128,256,512,1024]
+    lamda: 0.5
+    beta: 1.0
+
+  optimizer:
+    lr: 1e-4
+    epochs: 1000
+    weight_decay: 0.0005
+
+  

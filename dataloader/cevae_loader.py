@@ -10,13 +10,12 @@ from utils.image_utils import *
 from glob import glob
 
 class cevae(Dataset):
-    def __init__(self,path,patchsize,margin,transforms = None,mask=False):
+    def __init__(self,path,patchsize,margin,resize):
         self.path = path
         self.dataset = glob(path+'*.nii.gz',recursive=True)
         self.patchsize = patchsize
-        self.transforms = transforms
         self.margin = margin
-        self.mask = mask
+        self.resize = resize
 
     def __len__(self):
         return len(self.dataset)
@@ -26,10 +25,8 @@ class cevae(Dataset):
         x = image.get_data()
         
         mask = square_mask(x,self.margin,self.patchsize)
-#         if(self.mask == True):
-#             x = square_mask(x,self.margin,self.patchsize)
         x = RandomHorizontalFlip(x)
-        x = Resize(x,(128,128))
+        x = Resize(x,self.resize)
         x = normalise(x)
         x = np.expand_dims(x,axis=2)
         x = to_tensor(x).float()
