@@ -6,7 +6,7 @@ import torch
 import torch.nn.functional as F
 from torch.autograd import Variable as V
 from torch.utils.data import Dataset
-from utils.cevae_utils import *
+from utils.image_utils import *
 from glob import glob
 
 class cevae(Dataset):
