@@ -4,6 +4,7 @@ import torch.distributions as dist
 import torch.nn.functional as F
 import numpy as np
 import math
+from torch.autograd import grad
 
 def loss_function(recon_x,x,mu,logstd,rec_log_std=0,sum_samplewise=True):
     """
@@ -39,7 +40,7 @@ def loss_function(recon_x,x,mu,logstd,rec_log_std=0,sum_samplewise=True):
 
 def kl_loss_fn(recon_x,x,mu,logstd,rec_log_std=0,sum_samplewise=True):
     BCE = F.mse_loss(recon_x, x)
-    KLD = -0.5 * torch.sum(1 + logstd - mu.pow(2) - logstd.exp())
+    KLD = 0.5 * torch.sum(1 + logstd - mu.pow(2) - logstd.exp())
     # loss = nn.KLDivLoss()
     # losses = loss(mu,logstd**2)
     loss = BCE*KLD
@@ -64,3 +65,29 @@ def rec_loss_fn (recon_x,x):
     loss = loss_fn(x,recon_x)
 
     return loss
+
+def loss_fn(recon_x,x,x_ce,recon_ce,mu,logstd,rec_log_std=0,sum_samplewise=True):
+    l1_loss = nn.L1Loss()
+    recon_loss_vae = l1_loss(recon_x,x)
+    recon_loss_ce = l1_loss(recon_ce,x_ce)
+    losses = 0.5*(recon_loss_ce+recon_loss_vae)
+    rec_vae = torch.sum(recon_loss_vae)
+    rec_ce = torch.sum(recon_loss_ce)
+    loss_rec_ce = torch.mean(rec_ce)
+    loss_rec_vae = torch.mean(rec_vae)
+    kl = 0.5 * torch.sum(torch.square(mu)+torch.square(torch.exp(logstd))- torch.log(torch.square(torch.exp(logstd)))-1,axis=1)
+    kl_loss = torch.mean(kl)
+    loss = torch.mean(rec_vae+rec_ce+kl)
+    loss_vae = torch.mean(rec_vae+kl)
+    return loss, loss_vae
+
+def anomaly_score(x,recon_x):
+    l1_loss = nn.L1Loss()
+    recon_loss_vae = l1_loss(recon_x,x)
+    rec_vae = torch.sum(recon_loss_vae)
+    kl = 0.5 * torch.sum(torch.square(mu)+torch.square(torch.exp(logstd))- torch.log(torch.square(torch.exp(logstd)))-1,axis=1)
+    kl_loss = torch.mean(kl)
+    loss_vae = torch.mean(rec_vae+kl)
+    anomaly = recon_loss_vae + torch.abs(grad(loss_vae,x))[0]
+    return anomaly
+

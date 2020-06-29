@@ -6,12 +6,16 @@ train:
     margin: [80,80]
     batch: 512
     resize: [128,128]
+    num_workers: 4
 
   model:
-    z_dim: 1024
-    hidden_dim: [16,32,64,128,256,512,1024]
+    z_dim: 512
+    hidden_dim: [16,32,64,128,256,512]
+    input_size: [1,128,128]
     lamda: 0.5
     beta: 1.0
+    log_path: './logs/cevae/'
+    save_path: './saved_models/cevae/'
 
   optimizer:
     lr: 1e-4
