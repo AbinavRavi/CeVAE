@@ -1,7 +1,7 @@
 seed: 616
 train:
   dataloader:
-    path: './data'
+    path: './data/'
     patchsize: [64,64]
     margin: [80,80]
     batch: 512
@@ -9,8 +9,8 @@ train:
     num_workers: 4
 
   model:
-    z_dim: 512
-    hidden_dim: [16,32,64,128,256,512]
+    z_dim: 256
+    hidden_dim: [16,32,64,128,256]
     input_size: [1,128,128]
     lamda: 0.5
     beta: 1.0
@@ -18,7 +18,7 @@ train:
     save_path: './saved_models/cevae/'
 
   optimizer:
-    lr: 1e-4
+    lr: 0.0001
     epochs: 1000
     weight_decay: 0.0005
 

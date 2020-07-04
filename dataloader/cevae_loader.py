@@ -22,7 +22,7 @@ class cevae(Dataset):
 
     def __getitem__(self, index):
         image = nib.load(self.dataset[index])
-        x = image.get_data()
+        x = image.get_fdata()
         
         mask = square_mask(x,self.margin,self.patchsize)
         x = RandomHorizontalFlip(x)

@@ -66,7 +66,7 @@ def rec_loss_fn (recon_x,x):
 
     return loss
 
-def loss_fn(recon_x,x,x_ce,recon_ce,mu,logstd,rec_log_std=0,sum_samplewise=True):
+def criterion(recon_x,x,recon_ce,x_ce,mu,logstd,rec_log_std=0,sum_samplewise=True):
     l1_loss = nn.L1Loss()
     recon_loss_vae = l1_loss(recon_x,x)
     recon_loss_ce = l1_loss(recon_ce,x_ce)
@@ -75,7 +75,7 @@ def loss_fn(recon_x,x,x_ce,recon_ce,mu,logstd,rec_log_std=0,sum_samplewise=True)
     rec_ce = torch.sum(recon_loss_ce)
     loss_rec_ce = torch.mean(rec_ce)
     loss_rec_vae = torch.mean(rec_vae)
-    kl = 0.5 * torch.sum(torch.square(mu)+torch.square(torch.exp(logstd))- torch.log(torch.square(torch.exp(logstd)))-1,axis=1)
+    kl = 0.5 * torch.sum(torch.pow(mu,2)+torch.pow(torch.exp(logstd),2)- torch.log(torch.pow(torch.exp(logstd),2))-1,axis=1)
     kl_loss = torch.mean(kl)
     loss = torch.mean(rec_vae+rec_ce+kl)
     loss_vae = torch.mean(rec_vae+kl)
@@ -85,7 +85,7 @@ def anomaly_score(x,recon_x):
     l1_loss = nn.L1Loss()
     recon_loss_vae = l1_loss(recon_x,x)
     rec_vae = torch.sum(recon_loss_vae)
-    kl = 0.5 * torch.sum(torch.square(mu)+torch.square(torch.exp(logstd))- torch.log(torch.square(torch.exp(logstd)))-1,axis=1)
+    kl = 0.5 * torch.sum(torch.pow(mu,2)+torch.pow(torch.exp(logstd),2)- torch.log(torch.pow(torch.exp(logstd),2))-1,axis=1)
     kl_loss = torch.mean(kl)
     loss_vae = torch.mean(rec_vae+kl)
     anomaly = recon_loss_vae + torch.abs(grad(loss_vae,x))[0]
