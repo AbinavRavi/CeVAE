@@ -27,7 +27,7 @@ class cevae(Dataset):
         mask = square_mask(x,self.margin,self.patchsize)
         x = RandomHorizontalFlip(x)
         x = Resize(x,self.resize)
-        x = normalise(x)
+        # x = normalise(x)
         x = np.expand_dims(x,axis=2)
         x = to_tensor(x).float()
         masked_image = torch.where(mask !=0,mask,x)

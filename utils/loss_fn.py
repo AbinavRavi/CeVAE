@@ -66,28 +66,37 @@ def rec_loss_fn (recon_x,x):
 
     return loss
 
-def criterion(recon_x,x,recon_ce,x_ce,mu,logstd,rec_log_std=0,sum_samplewise=True):
-    l1_loss = nn.L1Loss()
-    recon_loss_vae = l1_loss(recon_x,x)
-    recon_loss_ce = l1_loss(recon_ce,x_ce)
-    losses = 0.5*(recon_loss_ce+recon_loss_vae)
-    rec_vae = torch.sum(recon_loss_vae)
-    rec_ce = torch.sum(recon_loss_ce)
-    loss_rec_ce = torch.mean(rec_ce)
-    loss_rec_vae = torch.mean(rec_vae)
-    kl = 0.5 * torch.sum(torch.pow(mu,2)+torch.pow(torch.exp(logstd),2)- torch.log(torch.pow(torch.exp(logstd),2))-1,axis=1)
-    kl_loss = torch.mean(kl)
-    loss = torch.mean(rec_vae+rec_ce+kl)
-    loss_vae = torch.mean(rec_vae+kl)
-    return loss, loss_vae
+def kl_divergence(mu, logsigma):
+        """Compute KL divergence KL(q_i(z)||p(z)) for each q_i in the batch.
+        
+        Args:
+            mu: Means of the q_i distributions, shape [batch_size, latent_dim]
+            logsigma: Logarithm of standard deviations of the q_i distributions,
+                      shape [batch_size, latent_dim]
+        
+        Returns:
+            kl: KL divergence for each of the q_i distributions, shape [batch_size]
+        """
+        ##########################################################
+        # YOUR CODE HERE
+        sigma = torch.exp(logsigma)
+        
+        kl = 0.5*(torch.sum(sigma**2 + mu**2 - torch.log(sigma**2) - 1))
+        
+        return kl
 
-def anomaly_score(x,recon_x):
-    l1_loss = nn.L1Loss()
-    recon_loss_vae = l1_loss(recon_x,x)
-    rec_vae = torch.sum(recon_loss_vae)
-    kl = 0.5 * torch.sum(torch.pow(mu,2)+torch.pow(torch.exp(logstd),2)- torch.log(torch.pow(torch.exp(logstd),2))-1,axis=1)
-    kl_loss = torch.mean(kl)
-    loss_vae = torch.mean(rec_vae+kl)
-    anomaly = recon_loss_vae + torch.abs(grad(loss_vae,x))[0]
-    return anomaly
+def cevae_loss(recon_x,x,recon_ce,mu,std,lamda,rec_log_std=0,sum_samplewise=True):
+    l2_loss = nn.MSELoss()
+    recon_vae = l2_loss(recon_x,x)
+    recon_ce = l2_loss(recon_ce,x)
+
+    z_prior = dist.Normal(0, 1.)
+    z_post = dist.Normal(mu, torch.exp(std))
+
+    kl_div = dist.kl_divergence(z_post, z_prior)
+    if sum_samplewise:
+        kl_div = torch.sum(kl_div, dim=(1, 2, 3))
+        kl_div = torch.mean(kl_div)
+    loss = (1 - lamda)* (kl_div + recon_vae) + lamda* recon_ce
+    return loss
 

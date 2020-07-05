@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 import yaml
+import torch.nn as nn
 
 def set_seed(seed = 1234):
     torch.manual_seed(seed)
