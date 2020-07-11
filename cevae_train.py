@@ -94,7 +94,7 @@ train_loader,val_loader = image_loader.cevae_batch(path,patch_size,margin,resize
 
 model = enc_dec.VAE(input_size, h_size, z_dim)
 model = model.to(device)
-model.apply(utils.weights_init)
+# model.apply(utils.weights_init)
 optimizer = optim.Adam(model.parameters(),lr=learning_rate)
 scheduler = ReduceLROnPlateau(optimizer,threshold=0.0001,eps=1e-4)
 

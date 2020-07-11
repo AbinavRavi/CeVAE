@@ -146,3 +146,4 @@ cython_debug/
 /normal/
 /abnormal/
 trials.ipynb
+/segmentations/
