@@ -22,4 +22,24 @@ train:
     epochs: 1000
     weight_decay: 0.0005
 
-  
+inference:
+  seed: 616
+  dataloader:
+    normal_path: './All_normal/'
+    abnormal_path: './all_abnormal/'
+    normal_volumes: './normal/'
+    abnormal_volumes: './abnormal/'
+    patchsize: [64,64]
+    margin: [80,80]
+    batch: 1
+    resize: [128,128]
+    num_workers: 1
+
+  model:
+    load_model: './saved_models/cevae/CeVAE_V1_512_0.0001_864.pt'
+    num_classes: 1
+    input_size: [1,128,128]
+    z_dim: 256
+    h_size: [16,32,64,128,256]
+    lamda: 0.5
+    beta: 0.0001

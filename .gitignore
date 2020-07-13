@@ -147,3 +147,4 @@ cython_debug/
 /abnormal/
 trials.ipynb
 /segmentations/
+/masks/
