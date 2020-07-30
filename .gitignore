@@ -148,3 +148,4 @@ cython_debug/
 trials.ipynb
 /segmentations/
 /masks/
+/results/

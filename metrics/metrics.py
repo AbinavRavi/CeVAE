@@ -12,7 +12,7 @@ def get_metrics(_pos, _neg):
     pr_curve = sk.precision_recall_curve(labels,examples)
     precision,recall,_ = pr_curve
     aupr = sk.auc(recall,precision)
-    return auroc,aupr
+    return auroc,aupr,roc_curve,pr_curve
 
 def dice(im1, im2, empty_score=1.0):
     """
